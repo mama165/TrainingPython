@@ -1,0 +1,24 @@
+#--------------------------EXPLANATION--------------------------
+#https://docs.python-guide.org/writing/structure/
+#https://docs.python-guide.org/writing/structure/
+#https://python.doctor/page-apprendre-creer-fonction-en-python
+
+#What is the hierarchy of a python projet ?
+
+./docs
+./sample
+
+#Is python an object oriented programming language ?
+In python everything is an object and can be handled as such.
+For example, functions are first-class objects.
+Functions, classes, string and types are objects.
+They all can be passes as function arguments.
+
+#Is python like Java ?
+Unlike Java, Python does not impose object-oriented programming as the main paradigm.
+It viable to have a project without object-oriented design.
+
+#How to do some unit tests ?
+#https://docs.python.org/fr/3/library/unittest.html
+Create a package ./tests
+Run python -m unittest tests/test_calculator.py
