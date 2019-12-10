@@ -1,6 +1,6 @@
-from sample.bankaccount.amount import Amount
-from sample.bankaccount.operation import Operation
-from sample.bankaccount.operation_type import OperationType
+from sample.bankaccount.models.amount import Amount
+from sample.bankaccount.models.operation import Operation
+from sample.bankaccount.models.operation_type import OperationType
 
 
 class AccountService(object):
@@ -10,7 +10,7 @@ class AccountService(object):
 
     def deposit(self, account_id, value):
         amount = Amount(value)
-        operation = Operation(account_id, amount, OperationType.DEPOSIT, self.date_service)
+        operation = Operation(account_id, amount, OperationType.DEPOSIT)
         self.operation_repository.add(operation)
 
     def withdraw(self, account_id, value):

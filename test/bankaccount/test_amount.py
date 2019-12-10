@@ -1,6 +1,6 @@
 import unittest
 
-from sample.bankaccount.amount import Amount
+from sample.bankaccount.models.amount import Amount
 from sample.bankaccount.exceptions.negative_amount import AmountNegativeError
 
 
