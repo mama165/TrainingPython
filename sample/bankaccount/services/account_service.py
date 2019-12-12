@@ -34,8 +34,8 @@ class AccountService(object):
 
         for operation in operations:
             if operation.operationType == OperationType.DEPOSIT:
-                balance + operation.amount
+                balance += operation.amount
             if operation.operationType == OperationType.WITHDRAWAL:
-                balance - operation.amount
+                balance -= operation.amount
 
         return balance
