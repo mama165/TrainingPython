@@ -1,9 +1,20 @@
 class Operation:
-    def __init__(self, account_id, amount, operation_type):
+    """
+    account_id : long
+    amount : Decimal
+    operation_type : Enum
+    time : datetime
+    """
+    def __init__(self, account_id, amount, operation_type, time):
         self.account_id = account_id
         self.amount = amount
         self.operationType = operation_type
-        # self.time = time
+        self.time = time
+
+    @staticmethod
+    def create(account_id, amount, operation_type, time):
+        amount_extracted = amount.get_amount()
+        return Operation(account_id, amount_extracted, operation_type, time)
 
     def __eq__(self, other):
         """Return true if both object are equal"""

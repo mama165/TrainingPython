@@ -1,6 +1,3 @@
-import array
-
-
 def iterateThroughList(list):
     dictionary = {}
     visited = []
