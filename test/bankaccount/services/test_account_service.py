@@ -16,17 +16,18 @@ class AccountServiceTest(unittest.TestCase):
         self.operation_repository = OperationRepository()
         self.date_service = DateService()
         self.account_service = AccountService(self.operation_repository, self.date_service)
-        self.ACCOUNT_ID = "9486563683673946"
+        self.ACCOUNT_ID = 9486563683673946
         self.mocked_date = "1424080802"
 
     """mock_add.assert_not_called() won't work
         use mock_add.call_count instead
         see : http://engineroom.trackmaven.com/blog/mocking-mistakes/
     """
+
     @patch("sample.bankaccount.repositories.operation_repository.OperationRepository.add")
     def test_should_throw_exception_on_deposit_when_amount_negative(self, mock_add):
         with self.assertRaises(AmountNegativeError) as error:
-            self.account_service.deposit(self.ACCOUNT_ID, -4)
+            self.account_service.deposit(self.ACCOUNT_ID, "-4")
 
         self.assertTrue(mock_add.call_count == 0)
         self.assertEqual(error.exception.message, "The amount is a negative number : -4")
@@ -40,17 +41,35 @@ class AccountServiceTest(unittest.TestCase):
                                              self.mocked_date)
         mock_add.assert_called_once_with(operation_deposit)
 
-    def test_should_throw_exception_on_withdrawal_when_amount_negative(self):
-        with self.assertRaises(AmountNegativeError) as error:
-            self.account_service.withdraw(self.ACCOUNT_ID, -4)
-        self.assertEqual(error.exception.message, "The amount is a negative number : -4")
+    @patch("sample.bankaccount.repositories.operation_repository.OperationRepository.add")
+    def test_should_throw_exception_on_withdrawal_when_amount_negative(self, mock_add):
+        for value in {"-4", "-5", "-6", "-7"}:
+            with self.assertRaises(AmountNegativeError) as error:
+                self.account_service.withdraw(self.ACCOUNT_ID, value)
 
-    def test_should_record_operation_when_withdrawal(self):
-        pass
+            self.assertTrue(mock_add.call_count == 0)
+            self.assertEqual(error.exception.message, "The amount is a negative number : " + value)
 
+    @patch("sample.bankaccount.repositories.operation_repository.OperationRepository.add")
     @patch("sample.bankaccount.repositories.operation_repository.OperationRepository.find_all")
     @patch("sample.bankaccount.services.date_service.DateService.get_date")
-    def test_should_throw_exception_on_withdrawal_when_not_enough_money(self, mock_date, mock_find_all):
+    def test_should_record_operation_when_withdrawal(self, mock_date, mock_find_all, mock_add):
+        operation_deposit = Operation.create(self.ACCOUNT_ID, Amount.create("20"), OperationType.DEPOSIT,
+                                             self.mocked_date)
+        operation_withdrawal = Operation.create(self.ACCOUNT_ID, Amount.create("10"), OperationType.WITHDRAWAL,
+                                                self.mocked_date)
+        operations = [operation_deposit]
+
+        mock_date.return_value = self.mocked_date
+        mock_find_all.return_value = operations
+
+        self.account_service.withdraw(self.ACCOUNT_ID, "10")
+        mock_add.assert_called_once_with(operation_withdrawal)
+
+    @patch("sample.bankaccount.repositories.operation_repository.OperationRepository.add")
+    @patch("sample.bankaccount.repositories.operation_repository.OperationRepository.find_all")
+    @patch("sample.bankaccount.services.date_service.DateService.get_date")
+    def test_should_throw_exception_on_withdrawal_when_not_enough_money(self, mock_date, mock_find_all, mock_add):
         mock_date.return_value = self.mocked_date
         operation_deposit = Operation.create(self.ACCOUNT_ID, Amount.create("4"), OperationType.DEPOSIT,
                                              self.mocked_date)
@@ -58,8 +77,9 @@ class AccountServiceTest(unittest.TestCase):
         mock_find_all.return_value = operation_list
 
         with self.assertRaises(NotEnoughMoneyOnAccountError) as error:
-            self.account_service.withdraw(self.ACCOUNT_ID, 10)
-        # self.operation_repository.add.assert_not_called()
+            self.account_service.withdraw(self.ACCOUNT_ID, "10")
+
+        self.assertTrue(mock_add.call_count == 0)
         self.assertEqual(error.exception.message, "Withdrawal impossible with amount : 10")
 
 
