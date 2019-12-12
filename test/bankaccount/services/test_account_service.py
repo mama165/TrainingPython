@@ -19,9 +19,16 @@ class AccountServiceTest(unittest.TestCase):
         self.ACCOUNT_ID = "9486563683673946"
         self.mocked_date = "1424080802"
 
-    def test_should_throw_exception_on_deposit_when_amount_negative(self):
+    """mock_add.assert_not_called() won't work
+        use mock_add.call_count instead
+        see : http://engineroom.trackmaven.com/blog/mocking-mistakes/
+    """
+    @patch("sample.bankaccount.repositories.operation_repository.OperationRepository.add")
+    def test_should_throw_exception_on_deposit_when_amount_negative(self, mock_add):
         with self.assertRaises(AmountNegativeError) as error:
             self.account_service.deposit(self.ACCOUNT_ID, -4)
+
+        self.assertTrue(mock_add.call_count == 0)
         self.assertEqual(error.exception.message, "The amount is a negative number : -4")
 
     @patch("sample.bankaccount.repositories.operation_repository.OperationRepository.add")
